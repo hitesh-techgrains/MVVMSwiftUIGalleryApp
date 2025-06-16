@@ -9,25 +9,25 @@ import SwiftUI
 
 struct ContentView: View {
     
-    var arrImages = ["pic1","pic2","pic3","pic4"]
+    @ObservedObject var picsViewModel: PicsViewModel
+    
     
     var body: some View {
        
         NavigationView{
-            List(arrImages, id: \.self){ image in
+            List(picsViewModel.picsModel, id: \.self){ model in
                 VStack {
-                    Image(image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .cornerRadius(20)
-                        .shadow(radius: 4)
+                    AsyncPicsImageView(url : model.downloadUrl ?? "")
                     
-                    Text("Hello, world!")
+                    Text(model.author ?? "")
                         .padding(.top, 10)
                 }
                 .padding()
                 .listRowSeparator(.hidden)
             }
+            .onAppear(perform:{
+                picsViewModel.lodData()
+            })
             .navigationTitle("Gallery")
         }
         
@@ -35,5 +35,30 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(picsViewModel: PicsViewModel())
+}
+
+struct AsyncPicsImageView: View {
+    var url: String
+    var body: some View {
+        AsyncImage(url: URL(string: url)){
+            phase in
+            switch phase{
+            case .empty :
+                ProgressView()
+            case .success(let image) :
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .cornerRadius(20)
+                    .shadow(radius: 4)
+                
+            case .failure :
+                ProgressView()
+                
+            default: EmptyView()
+            }
+            
+        }
+    }
 }
