@@ -16,14 +16,19 @@ struct ContentView: View {
        
         NavigationView{
             List(picsViewModel.picsModel, id: \.self){ model in
-                VStack {
-                    AsyncPicsImageView(url : model.downloadUrl ?? "")
-                    
-                    Text(model.author ?? "")
-                        .padding(.top, 10)
+                
+                NavigationLink(destination: AsyncPicsImageView(url: model.downloadUrl ?? "",isDetailView: true).ignoresSafeArea()){
+                  
+                    VStack {
+                        AsyncPicsImageView(url : model.downloadUrl ?? "")
+                        
+                        Text(model.author ?? "")
+                            .padding(.top, 10)
+                    }
+                    .padding()
+                    .listRowSeparator(.hidden)
                 }
-                .padding()
-                .listRowSeparator(.hidden)
+        
             }
             .onAppear(perform:{
                 picsViewModel.lodData()
@@ -40,6 +45,8 @@ struct ContentView: View {
 
 struct AsyncPicsImageView: View {
     var url: String
+    var isDetailView: Bool = false
+    
     var body: some View {
         AsyncImage(url: URL(string: url)){
             phase in
@@ -49,7 +56,7 @@ struct AsyncPicsImageView: View {
             case .success(let image) :
                 image
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .aspectRatio(contentMode: isDetailView ? .fill :.fit)
                     .cornerRadius(20)
                     .shadow(radius: 4)
                 
