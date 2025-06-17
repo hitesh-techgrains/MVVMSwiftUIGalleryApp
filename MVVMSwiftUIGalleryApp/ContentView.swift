@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  MVVMSwiftUIGalleryApp
-//
-//  Created by admin on 16/06/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -13,7 +6,7 @@ struct ContentView: View {
     // Define grid columns — 2 columns side by side
     let columns = [
         GridItem(.flexible()),
-        GridItem(.flexible()), // add more if you want
+        GridItem(.flexible()),
         GridItem(.flexible()) // add more if you want
     ]
     
@@ -24,18 +17,19 @@ struct ContentView: View {
                     ForEach(picsViewModel.picsModel, id: \.id) { model in
                         NavigationLink(destination: AsyncPicsImageView(url: model.downloadUrl ?? "", isDetailView: true)
                             .ignoresSafeArea()) {
-                                
                                 GalleryItemView(model: model)
                             }
                     }
                 }
                 .padding()
             }
+
             .navigationTitle("Gallery")
             .onAppear {
                 print("onAppear")
                 picsViewModel.lodData()
             }
+        
         }
     }
 }
@@ -55,39 +49,34 @@ struct GalleryItemView: View {
 }
 
 struct AsyncPicsImageView: View {
+    @StateObject private var imageLoader = ImageLoader()
     var url: String
     var isDetailView: Bool = false
     
     var body: some View {
-        AsyncImage(url: URL(string: url)) { phase in
-            switch phase {
-            case .empty:
-                ProgressView()
-                    .aspectRatio(1, contentMode: .fill)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 100)
-                    .cornerRadius(20)
-                    .shadow(radius: 4)
-
-            case .success(let image):
-                image
-                    .resizable()
-                    .aspectRatio(1, contentMode: .fill)
-                    .frame(minWidth: 0, maxWidth: .infinity)
-                    .clipped()
-                    .cornerRadius(20)
-                    .shadow(radius: 4)
-
-            case .failure:
-                ProgressView()
-                    .aspectRatio(1, contentMode: .fill)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 100)
-                    .cornerRadius(20)
-                    .shadow(radius: 4)
-
-            @unknown default:
-                EmptyView()
-            }
+        
+        VStack{
+            if let image = imageLoader.image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fill)
+                        .frame(minWidth: 0, maxWidth: .infinity)
+                        .clipped()
+                        .cornerRadius(20)
+                        .shadow(radius: 4)
+                } else {
+                    ProgressView()
+                        .aspectRatio(1, contentMode: .fill)
+                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 100)
+                        .cornerRadius(20)
+                        .shadow(radius: 4)
+                }
         }
+        .onAppear {
+                    imageLoader.loadImage(from: url)
+                }
+        
+
     }
 }
 
