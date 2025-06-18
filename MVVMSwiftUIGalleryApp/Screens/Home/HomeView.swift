@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct HomeView: View {
     @ObservedObject var picsViewModel: PicsViewModel
     
     // Define grid columns — 2 columns side by side
@@ -23,13 +23,17 @@ struct ContentView: View {
                 }
                 .padding()
             }
-
             .navigationTitle("Gallery")
             .onAppear {
                 print("onAppear")
                 picsViewModel.lodData()
             }
-        
+            .toolbar {
+                NavigationLink(destination: LoginView()
+                    .ignoresSafeArea()) {
+                        Label("Operation", systemImage: "swiftdata")
+                    }
+            }
         }
     }
 }
@@ -81,5 +85,5 @@ struct AsyncPicsImageView: View {
 }
 
 #Preview {
-    ContentView(picsViewModel: PicsViewModel())
+    HomeView(picsViewModel: PicsViewModel())
 }
