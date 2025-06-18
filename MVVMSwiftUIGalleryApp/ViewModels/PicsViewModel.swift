@@ -5,6 +5,7 @@ class PicsViewModel : ObservableObject{
     
     @Published var picsModel = [PicsModel]()
     private var isLoaded = false
+
     
     func lodData(){
         print("isLoaded...\(isLoaded)")

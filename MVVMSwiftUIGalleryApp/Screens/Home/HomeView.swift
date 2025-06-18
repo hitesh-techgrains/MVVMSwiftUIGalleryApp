@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var picsViewModel: PicsViewModel
+    @State private var navigateToLogin = false
     
     // Define grid columns — 2 columns side by side
     let columns = [
@@ -13,29 +14,54 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 20) {
-                    ForEach(picsViewModel.picsModel, id: \.id) { model in
-                        NavigationLink(destination: AsyncPicsImageView(url: model.downloadUrl ?? "", isDetailView: true)
-                            .ignoresSafeArea()) {
-                                GalleryItemView(model: model)
+                VStack(spacing: 0) {
+                    HStack {
+                        Text("Gallery")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                            Menu {
+                                Button("Login", action: { print("Edit tapped")
+                                    navigateToLogin = true
+                                    
+                                })
+                                Button("Settings", action: { print("Share tapped") })
+                            } label: {
+                                Image(systemName: "ellipsis")
+                                    .rotationEffect(.degrees(90)) // vertical ellipsis look
+                                    .font(.title2)
                             }
+                        
                     }
+                    .padding(.horizontal)
+                    .padding(.bottom, 10)
+                    
+                    // 🔽 Hidden NavigationLink
+                    NavigationLink(destination: LoginView(), isActive: $navigateToLogin) {
+                                     EmptyView()
+                                 }
+                                 .hidden()
+
+
+                    LazyVGrid(columns: columns, spacing: 20) {
+                        ForEach(picsViewModel.picsModel, id: \.id) { model in
+                            NavigationLink(destination: AsyncPicsImageView(url: model.downloadUrl ?? "", isDetailView: true)
+                                .ignoresSafeArea()) {
+                                    GalleryItemView(model: model)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
-                .padding()
             }
-            .navigationTitle("Gallery")
             .onAppear {
                 print("onAppear")
                 picsViewModel.lodData()
             }
-            .toolbar {
-                NavigationLink(destination: LoginView()
-                    .ignoresSafeArea()) {
-                        Label("Operation", systemImage: "swiftdata")
-                    }
-            }
         }
     }
+    
 }
 
 struct GalleryItemView: View {
