@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var picsViewModel: PicsViewModel
     @State private var navigateToLogin = false
+    @State private var navigateToCalendar = false
     
     // Define grid columns — 2 columns side by side
     let columns = [
@@ -10,6 +11,8 @@ struct HomeView: View {
         GridItem(.flexible()),
         GridItem(.flexible()) // add more if you want
     ]
+   
+    
     
     var body: some View {
         NavigationView {
@@ -24,23 +27,27 @@ struct HomeView: View {
                             Menu {
                                 Button("Login", action: { print("Edit tapped")
                                     navigateToLogin = true
+                                })
+                                Button("Calendar", action: {
+                                    print("Share tapped")
+                                    navigateToCalendar = true
                                     
                                 })
-                                Button("Settings", action: { print("Share tapped") })
                             } label: {
                                 Image(systemName: "ellipsis")
                                     .rotationEffect(.degrees(90)) // vertical ellipsis look
                                     .font(.title2)
                             }
-                        
                     }
                     .padding(.horizontal)
                     .padding(.bottom, 10)
                     
                     // 🔽 Hidden NavigationLink
-                    NavigationLink(destination: LoginView(), isActive: $navigateToLogin) {
-                                     EmptyView()
-                                 }
+                    NavigationLink(destination: LoginView(), isActive: $navigateToLogin) {EmptyView()}
+                                 .hidden()
+                    
+                    // 🔽 Hidden NavigationLink
+                    NavigationLink(destination: CalendarView(), isActive: $navigateToCalendar) {EmptyView()}
                                  .hidden()
 
 
